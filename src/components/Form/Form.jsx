@@ -1,17 +1,15 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { addContact } from '../../redux/contactsSlice'
+import { addContact } from '../../redux/operations'
 import { selectContactList } from '../../redux/selectors'
 import css from './Form.module.css'
 import { nanoid } from 'nanoid'
-
-
 
 const Form = () => {
     const dispatch = useDispatch();
     const contacts = useSelector(selectContactList);
     const [name, setName] = useState('');
-    const [number, setNumber] = useState('');
+    const [phone, setPhone] = useState('');
 
     const onChangeName = (e) => {
         const {name, value} = e.target;
@@ -21,8 +19,8 @@ const Form = () => {
                 setName(value);
                 break;
 
-            case 'number':
-                setNumber(value);
+            case 'phone':
+                setPhone(value);
                 break;
 
             default:
@@ -34,8 +32,8 @@ const Form = () => {
         event.preventDefault();
         const id = nanoid().toString();
         const formName = name.trim().toString();
-        const formNumber = number.trim().toString();
-        const finalFormData = {id, name: formName, number: formNumber};
+        const formPhone = phone.trim().toString();
+        const finalFormData = {id, name: formName, phone: formPhone};
 
         const duplicate = contacts.some(contact => contact.name.toLowerCase() === formName.toLowerCase());
         if(duplicate) {
@@ -49,7 +47,7 @@ const Form = () => {
 
     const reset = () => {
         setName('');
-        setNumber('');
+        setPhone('');
     }
 
     return (
@@ -58,9 +56,9 @@ const Form = () => {
                 <span className={css.name}>Name</span>
                 <input type="text" name="name" className={css.input} value={name} onChange={onChangeName} required />
             </label>
-            <label htmlFor="number" className={css.label}>
+            <label htmlFor="phone" className={css.label}>
                 <span className={css.name}>Number</span>
-                <input type="tel" name="number" className={css.input} value={number} onChange={onChangeName} required />
+                <input type="tel" name="phone" className={css.input} value={phone} onChange={onChangeName} required />
             </label>
             <button type="submit" className={css.button}>Add contact</button>
         </form>

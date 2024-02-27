@@ -1,27 +1,55 @@
-import { createSlice } from "@reduxjs/toolkit"
-import { persistReducer } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
+import {  createSlice } from '@reduxjs/toolkit'
+import { fetchContacts, deleteContact, addContact } from './operations'
 
 const contactsSlice = createSlice({
     name: 'contacts',
     initialState: {
-        contactList: []
+        contactList: [],
+        loading: false,
+        error: null
     },
-    reducers: {
-        addContact: (state, action) => {
-            state.contactList.push(action.payload)},
-        deleteContact: (state, action) => {
-            const index = state.contactList.findIndex(task => task.id === action.payload);
-            state.contactList.splice(index, 1)
-        }
-    }
+    extraReducers: builder => 
+        builder
+            .addCase(fetchContacts.pending, (state) => {
+                state.loading = true;
+                state.error = false;
+            })
+            .addCase(fetchContacts.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = false;
+                state.contactList = action.payload;
+                
+            })
+            .addCase(fetchContacts.rejected, (state) => {
+                state.loading = false;
+                state.error = true;
+            })
+            .addCase(deleteContact.pending, (state) => {
+                state.loading = true;
+                state.error = false;
+            })
+            .addCase(deleteContact.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = false;
+                state.contactList = state.contactList.filter(contact => contact.id !== action.payload.id);
+            })
+            .addCase(deleteContact.rejected, (state) => {
+                state.loading = false;
+                state.error = true;
+            })
+            .addCase(addContact.pending, (state) => {
+                state.loading = true;
+                state.error = false;
+            })
+            .addCase(addContact.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = false;
+                state.contactList.push(action.payload);
+            })
+            .addCase(addContact.rejected, (state) => {
+                state.loading = false;
+                state.error = true;
+            })
 })
 
-export const { addContact, deleteContact }= contactsSlice.actions;
-
-const persistBalanceConfig = {
-    key: 'root',
-    storage,
-  };
-
-export const contactsReducer = persistReducer(persistBalanceConfig, contactsSlice.reducer);
+export const contactsReducer = contactsSlice.reducer
